@@ -1,30 +1,18 @@
 pipeline {
     agent any
-
     stages {
-        stage ('Compile Stage') {
-
+        stage("Build Maven") {
             steps {
-                withMaven(maven : 'maven_3.0.5') {
-                    sh 'mvn clean compile'
-                }
+                sh 'mvn -B clean package'
             }
         }
-
-        stage ('Testing Stage') {
-
+        stage("Run Gatling") {
             steps {
-                withMaven(maven : 'maven_3.0.5') {
-                    sh 'mvn test'
-                }
+                sh 'mvn gatling:test'
             }
-        }
-
-
-        stage ('Deployment Stage') {
-            steps {
-                withMaven(maven : 'maven_3.0.5') {
-                    sh 'mvn deploy'
+            post {
+                always {
+                    gatlingArchive()
                 }
             }
         }
